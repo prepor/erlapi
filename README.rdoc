@@ -1,0 +1,7 @@
+= erlapi
+
+Description goes here.
+
+== Copyright
+
+Copyright (c) 2009 Andrew Rudenko. See LICENSE for details.
