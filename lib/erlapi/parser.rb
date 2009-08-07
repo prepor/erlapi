@@ -20,22 +20,28 @@ module Erlapi::Parser
   
     def parse
       files.each do |file|
+        puts "Parsing #{file}"
         doc = Nokogiri::XML(File.read(file))
         
         begin
           
           mod = Erlapi::Parser::Module.new(self, doc)
-          self.modules[mod.title] = mod if mod.title && mod.title != ''
-        rescue XML::XSLT::ParsingError
-          puts "Parsing error: #{file}"
+          self.modules[mod.title] = mod if mod.valid
+
         end
         
       end
     end
     
+    def special_tags(str)
+      str.gsub!(/<c>(.*?)<\/c>/mi, '<tt>\1</tt>')
+      str.gsub(/<code.*?>(.*?)<\/code>/mi, '<pre>\1</pre>')
+      str.gsub(/<v.*?>(.*?)<\/v>/mi, '<b>\1</b><br/>')
+    end
+    
     def xslt(template, xml)
       xslt = XML::XSLT.new()
-      xslt.xml = '<?xml version="1.0" encoding="utf-8" ?><root>' + self.entities_coder.decode(xml) + '</root>'
+      xslt.xml = '<?xml version="1.0" encoding="utf-8" ?><root>' + xml + '</root>'
       xslt.xsl = File.read(File.join(self.template_dir, 'xslt', template))
       str = xslt.serve() || ''
       str.gsub('\011', "\t")
@@ -64,23 +70,41 @@ module Erlapi::Parser
   end
 
   class Module
-    attr_accessor :parser, :title, :summary, :desc, :datatypes, :funcs, :sections
+    attr_accessor :parser, :title, :summary, :desc, :datatypes, :funcs, :sections, :valid, :doc
     def initialize(parser, doc)
+      self.doc = doc
       self.parser = parser
-      self.title = doc.css('module').inner_html || ''
+      self.title = doc.css('module').inner_html
       self.summary = doc.css('modulesummary').inner_html || ''
-      self.desc = self.parser.xslt('desc.xsl', doc.css('description').inner_html)
+      if self.title && self.title != ''
+        self.valid = true
+      else
+        self.valid = false
+      end
+      if valid
+        define_desc
+        define_sections
+        define_funcs
+      end
+    end
+    
+    def define_desc
+      self.desc = self.parser.special_tags(doc.css('description').inner_html)
+    end
+    
+    def define_sections
       self.sections = []
       doc.css('section').each do |node|
         self.sections << Erlapi::Parser::Section.new(self, node)
       end
-      
+    end
+    
+    def define_funcs
       self.funcs = []
       doc.css('funcs func').each do |node|
         func = Erlapi::Parser::Func.new(self, node)
         self.funcs << func if func.short_name
-      end      
-      
+      end
     end
   end
   
@@ -96,8 +120,8 @@ module Erlapi::Parser
       end
       self.ref = self.names.first.gsub(/[^\w]/, '')
       self.summary = node.css('fsummary').inner_html
-      self.types = self.p_module.parser.xslt('func_types.xsl', node.css('type').inner_html)
-      self.desc = self.p_module.parser.xslt('desc.xsl', node.css('desc').inner_html)
+      self.types = self.p_module.parser.special_tags(node.css('type').inner_html)
+      self.desc = self.p_module.parser.special_tags(node.css('desc').inner_html)
     end
   end
   
@@ -107,7 +131,7 @@ module Erlapi::Parser
     def initialize(p_module, node)
       self.p_module = p_module
       self.name = node.css('title').inner_html
-      self.desc = self.p_module.parser.xslt('desc.xsl', node.inner_html)
+      self.desc = self.p_module.parser.special_tags(node.inner_html)
     end
   end
 end

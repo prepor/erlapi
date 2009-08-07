@@ -6,7 +6,7 @@ begin
   Jeweler::Tasks.new do |gem|
     gem.name = "erlapi"
     gem.summary = %Q{TODO}
-    gem.email = "rudenkoco@gmail.com"
+    gem.email = "ceo@prepor.ru"
     gem.homepage = "http://github.com/preprocessor/erlapi"
     gem.authors = ["Andrew Rudenko"]
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
