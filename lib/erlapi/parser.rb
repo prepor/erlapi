@@ -1,10 +1,5 @@
 require 'nokogiri'
 
-require 'xml/xslt'
-require 'htmlentities'
-coder = HTMLEntities.new
-
-
 module Erlapi::Parser
   class Base
     attr_accessor :src_dir, :template_dir, :files, :modules, :entities_coder
@@ -15,7 +10,6 @@ module Erlapi::Parser
       
       self.src_dir.mkdir if !self.src_dir.directory?      
       self.template_dir = File.join(File.dirname(__FILE__), 'templates')
-      self.entities_coder = HTMLEntities.new
     end
   
     def parse
@@ -37,14 +31,6 @@ module Erlapi::Parser
       str.gsub!(/<c>(.*?)<\/c>/mi, '<tt>\1</tt>')
       str.gsub(/<code.*?>(.*?)<\/code>/mi, '<pre>\1</pre>')
       str.gsub(/<v.*?>(.*?)<\/v>/mi, '<b>\1</b><br/>')
-    end
-    
-    def xslt(template, xml)
-      xslt = XML::XSLT.new()
-      xslt.xml = '<?xml version="1.0" encoding="utf-8" ?><root>' + xml + '</root>'
-      xslt.xsl = File.read(File.join(self.template_dir, 'xslt', template))
-      str = xslt.serve() || ''
-      str.gsub('\011', "\t")
     end
   
     def files
