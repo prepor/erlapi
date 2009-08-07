@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{erlapi}
-  s.version = "0.1.3"
+  s.version = "0.1.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Andrew Rudenko"]
@@ -112,9 +112,6 @@ Gem::Specification.new do |s|
      "lib/erlapi/templates/html/shtml/resources/js/main.js",
      "lib/erlapi/templates/html/shtml/resources/js/searchdoc.js",
      "lib/erlapi/templates/html/shtml/resources/panel/index.html",
-     "lib/erlapi/templates/xslt/desc.xsl",
-     "lib/erlapi/templates/xslt/func_types.xsl",
-     "lib/test.rb",
      "test/erlapi_test.rb",
      "test/test_helper.rb"
   ]
