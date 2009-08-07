@@ -1,6 +1,12 @@
 = erlapi
 
-Description goes here.
+Generate searchable api docs for elang libs.
+
+Based on http://railsapi.com/
+
+== Usage
+
+erlapi -o ~/Docs/erlang -s dir/to/erlang/sources
 
 == Copyright
 

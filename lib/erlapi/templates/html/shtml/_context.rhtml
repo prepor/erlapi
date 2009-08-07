@@ -1,0 +1,63 @@
+<div id="content">
+    <% unless (desc = context.desc).empty? %>
+    <div class="description"><%= desc %></div>
+    <% end %>
+
+    <% sections = context.sections.select { |section| section.name } %>
+    <% unless sections.empty? %>
+    <div class="sectiontitle">Contents</div>
+    <ul>
+        <% sections.each do |section| %>
+        <li><a href="#"><%= h section.name %></a></li>
+        <% end %>
+    </ul>
+    <% end %>
+
+    <% 
+        list = context.funcs
+    %>
+    <% unless list.empty? %>
+    <div class="sectiontitle">Methods</div>
+    <ul>
+        <% list.sort{ |a, b| a.short_name <=> b.short_name }.each do |func| %>
+        <li><a href="#<%= func.ref %>"><%= func.names.first %></a></li>
+        <% end %>
+    </ul>
+    <% end %>
+
+     <% sections.each do |section| %>
+    <div class="sectiontitle"><%= h section.name %></div>
+    <% unless (description = section.desc).empty? %>
+    <div class="description">
+        <%= description %>
+    </div>
+    <% end %>
+    <% end %>
+	<div class="sectiontitle">Exports</div>
+		<% context.funcs.each do |func|
+            %>
+            <div class="method">
+                <div class="title">
+                    <a name="<%= func.ref %>"></a><b><%= func.names.join('<br/>') %></b>
+                </div>
+
+								<% unless func.types.empty? %>
+                <div class="func_types">
+									Types:
+									<p>
+                  <%= func.types %>
+									</p>
+                </div>
+                <% end %>
+                <% unless (description = func.desc).empty? %>
+                <div class="description">
+                  <%= description %>
+                </div>
+                <% end %>
+
+            </div>
+      <% end %>
+
+
+    
+</div>
