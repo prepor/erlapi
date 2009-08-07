@@ -7,7 +7,7 @@ begin
     gem.name = "erlapi"
     gem.summary = %Q{TODO}
     gem.email = "ceo@prepor.ru"
-    gem.homepage = "http://github.com/preprocessor/erlapi"
+    gem.homepage = "http://github.com/prepor/erlapi"
     gem.authors = ["Andrew Rudenko"]
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end

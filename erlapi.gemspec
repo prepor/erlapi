@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{erlapi}
-  s.version = "0.1.4"
+  s.version = "0.1.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Andrew Rudenko"]
@@ -116,7 +116,7 @@ Gem::Specification.new do |s|
      "test/test_helper.rb"
   ]
   s.has_rdoc = true
-  s.homepage = %q{http://github.com/preprocessor/erlapi}
+  s.homepage = %q{http://github.com/prepor/erlapi}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.1}
