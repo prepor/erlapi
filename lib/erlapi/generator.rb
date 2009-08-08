@@ -137,17 +137,19 @@ class Erlapi::Generator
       mod.funcs
     }.flatten
     
-    list.each do |method|
-      index[:searchIndex].push( search_string(method.p_module.title + ':' + method.short_name) + '()' )
-      index[:longSearchIndex].push( search_string(method.short_name) )
-      index[:info].push([
-        method.short_name, 
-        method.p_module.title + ':' + method.short_name,
-        method.p_module.title + '.html#' + method.ref,
-        '',        
-        snippet(method.summary),
-        TYPE_METHOD
-      ])
+    list.each do |func|
+      func.short_names.each do |func_name|
+        index[:searchIndex].push( search_string(func.p_module.title + ':' + func_name) + '()' )
+        index[:longSearchIndex].push(search_string(func_name))
+        index[:info].push([
+          func_name, 
+          func.p_module.title + ':' + func_name,
+          func.p_module.title + '.html#' + func.ref,
+          '',        
+          snippet(func.summary),
+          TYPE_METHOD
+        ])
+      end
     end
   end
   

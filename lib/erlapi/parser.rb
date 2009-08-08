@@ -6,9 +6,7 @@ module Erlapi::Parser
     def initialize(src_dir = nil)
       self.files = []
       self.modules = {}
-      self.src_dir = Pathname.new(src_dir || File.join(File.dirname(__FILE__), '..', 'src'))
-      
-      self.src_dir.mkdir if !self.src_dir.directory?      
+      self.src_dir = Pathname.new(src_dir || File.join(File.dirname(__FILE__), '..', 'src'))    
       self.template_dir = File.join(File.dirname(__FILE__), 'templates')
     end
   
@@ -17,20 +15,25 @@ module Erlapi::Parser
         puts "Parsing #{file}"
         doc = Nokogiri::XML(File.read(file))
         
-        begin
-          
-          mod = Erlapi::Parser::Module.new(self, doc)
-          self.modules[mod.title] = mod if mod.valid
-
-        end
-        
+        mod = Erlapi::Parser::Module.new(self, doc)
+        self.modules[mod.title] = mod if mod.valid
       end
+    end
+    
+    def inner_xml(node)
+      node.is_a?(Nokogiri::XML::NodeSet) ? node.collect{|j| j.children.to_xml}.join('') : node.children.to_xml      
     end
     
     def special_tags(str)
       str.gsub!(/<c>(.*?)<\/c>/mi, '<tt>\1</tt>')
-      str.gsub(/<code.*?>(.*?)<\/code>/mi, '<pre>\1</pre>')
-      str.gsub(/<v.*?>(.*?)<\/v>/mi, '<b>\1</b><br/>')
+      str.gsub!(/<code.*?>(.*?)<\/code>/mi, '<pre>\1</pre>')
+      str.gsub!(/<v.*?>(.*?)<\/v>/mi, '<b>\1</b><br/>')
+      str.gsub!(/<input.*?>(.*?)<\/input>/mi, '<tt>\1</tt><br/>')
+      str
+    end
+    
+    def prepare_string(str)
+      str.gsub(/\\\\/, '\\')
     end
   
     def files
@@ -75,9 +78,9 @@ module Erlapi::Parser
     end
     
     def define_desc
-      self.desc = self.parser.special_tags(doc.css('description').inner_html)
+      self.desc = self.parser.special_tags(self.parser.inner_xml(doc.css('description')))
     end
-    
+
     def define_sections
       self.sections = []
       doc.css('section').each do |node|
@@ -95,19 +98,23 @@ module Erlapi::Parser
   end
   
   class Func
-    attr_accessor :p_module, :short_name, :names, :summary, :types, :desc, :ref
+    attr_accessor :p_module, :short_name, :names, :summary, :types, :desc, :ref, :short_names
     
     def initialize(p_module, node)
       self.p_module = p_module
       self.names = node.css('name').map {|v| v.inner_html}
       if self.names
-        sh_m = self.names.first.match(/([\w\d_-]*)\(/)
-        self.short_name = sh_m[1] if sh_m
+        self.short_names = self.names.map { |n| n.match(/([\w\d_-]*)\(/) ? $~[1] : nil }.compact.uniq
+        self.short_name = self.short_names.first if self.short_names
       end
       self.ref = self.names.first.gsub(/[^\w]/, '')
-      self.summary = node.css('fsummary').inner_html
-      self.types = self.p_module.parser.special_tags(node.css('type').inner_html)
-      self.desc = self.p_module.parser.special_tags(node.css('desc').inner_html)
+      self.summary = parser.inner_xml(node.css('fsummary'))
+      self.types = parser.special_tags(parser.inner_xml(node.css('type')))
+      self.desc = parser.special_tags(parser.inner_xml(node.css('desc')))
+    end
+    
+    def parser
+      self.p_module.parser
     end
   end
   
@@ -117,7 +124,11 @@ module Erlapi::Parser
     def initialize(p_module, node)
       self.p_module = p_module
       self.name = node.css('title').inner_html
-      self.desc = self.p_module.parser.special_tags(node.inner_html)
+      self.desc = parser.special_tags(parser.inner_xml(node))
+    end
+    
+    def parser
+      self.p_module.parser
     end
   end
 end

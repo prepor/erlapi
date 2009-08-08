@@ -17,7 +17,7 @@
         list = context.funcs
     %>
     <% unless list.empty? %>
-    <div class="sectiontitle">Methods</div>
+    <div class="sectiontitle">Functions</div>
     <ul>
         <% list.sort{ |a, b| a.short_name <=> b.short_name }.each do |func| %>
         <li><a href="#<%= func.ref %>"><%= func.names.first %></a></li>

@@ -2,7 +2,9 @@
 
 Generate searchable api docs for elang libs.
 
-Based on http://railsapi.com/
+Based on http://railsapi.com/.
+
+Result for all Erlang OTP sources – http://erlapi.prepor.ru/docs/
 
 == Usage
 
