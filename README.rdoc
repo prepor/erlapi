@@ -8,7 +8,9 @@ Result for all Erlang OTP sources – http://erlapi.prepor.ru/docs/
 
 == Usage
 
-erlapi -o ~/Docs/erlang -s dir/to/erlang/sources
+  gem install erlapi
+
+  erlapi -o ~/Docs/erlang -s dir/to/erlang/sources
 
 == Copyright
 
